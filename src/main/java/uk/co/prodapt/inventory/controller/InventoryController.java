@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -37,14 +40,14 @@ public class InventoryController {
 
     @ApiResponse(responseCode = "200", description = "Returns list of all products", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Product.class))))
     @GetMapping
-    public List<Product> list() {
+    public List<Product> list() throws IOException, InterruptedException {
         return productService.getAll();
     }
-
-	@ApiResponse(responseCode = "200", description = "Returns list of products", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Product.class))))
+    
+    @ApiResponse(responseCode = "200", description = "Returns list of products", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Product.class))))
 	@GetMapping("/filtered")
 	public List<Product> listByAvailability(
-			@RequestParam(name = "availability", required = false) Boolean availability) {
+			@RequestParam(name = "availability", required = false) Boolean availability) throws IOException, InterruptedException {
 		return productService.getListByAvailability(availability);
 	}
 

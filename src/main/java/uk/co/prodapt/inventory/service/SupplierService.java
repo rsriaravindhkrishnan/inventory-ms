@@ -25,7 +25,6 @@ public class SupplierService {
 
     public SupplierService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.suppliers =loadFile();
     }
 
     /**

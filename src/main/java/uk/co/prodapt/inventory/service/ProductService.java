@@ -1,10 +1,12 @@
 package uk.co.prodapt.inventory.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import uk.co.prodapt.inventory.exception.DuplicateProductIDException;
@@ -17,7 +19,8 @@ public class ProductService {
     private final List<Product> products = new ArrayList<>();
     private final SupplierService supplierService;
 
-    public ProductService(SupplierService supplierService) {
+    @Autowired
+    public ProductService(SupplierService supplierService) throws IOException, InterruptedException {
         this.supplierService = supplierService;
 
         // Initialize some sample products
@@ -26,11 +29,11 @@ public class ProductService {
         products.add(new Product(3, "Product C", true, 3, null));
     }
 
-    public List<Product> getAll() {
+    public List<Product> getAll() throws IOException, InterruptedException {
         return enrichWithSupplierInfo(new ArrayList<>(products));
     }
 
-    public List<Product> getListByAvailability(Boolean availability) {
+    public List<Product> getListByAvailability(Boolean availability) throws IOException, InterruptedException {
 		return products.stream()
 				.filter(product ->  (availability == null || (availability == product.isAvailable())))
 				.map(this::enrichWithSupplierInfo)
@@ -44,14 +47,14 @@ public class ProductService {
                 .map(this::enrichWithSupplierInfo);
     }
 
-	public Product create(Product product) {
-		Boolean isAlreadyExists = products.stream().anyMatch(prod -> prod.getId() == product.getId());
+    public Product create(Product product) {
+    	Boolean isAlreadyExists = products.stream().anyMatch(prod -> prod.getId() == product.getId());
 		if (isAlreadyExists) {
 			throw new DuplicateProductIDException("Product ID with " + product.getId() + " is already created");
 		}
-		products.add(product);
-		return enrichWithSupplierInfo(product);
-	}
+        products.add(product);
+        return enrichWithSupplierInfo(product);
+    }
 
     public Product update(Integer id, Product updatedProduct) {
         Product existingProduct = getById(id).orElseThrow(() -> new RuntimeException("Product not found"));
@@ -65,7 +68,10 @@ public class ProductService {
         products.removeIf(product -> product.getId().equals(id));
     }
 
-    private List<Product> enrichWithSupplierInfo(List<Product> products) {
+    private List<Product> enrichWithSupplierInfo(List<Product> products) throws IOException, InterruptedException {
+    	System.out.println("supplierServicesupplierServicesupplierServicesupplierService");
+    	System.out.println(this.supplierService);
+    	this.supplierService.getAll();
         for (Product product : products) {
             enrichWithSupplierInfo(product);
         }
